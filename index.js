@@ -26,7 +26,7 @@ let persons = [
 ]
 
 const generateId = () => {
-  return Math.random() * 10000000
+  return Math.floor(Math.random() * 10000000)
 }
 
 app.get("/", (req, res) => {
@@ -40,16 +40,22 @@ app.get("/api/persons", (req, res) => {
 app.post("/api/persons", (req, res) => {
   const body = req.body
 
-  if (!body.name) {
+  if (!body.name || !body.number) {
     return res.status(400).json({
-      error: "missing name"
+      error: "missing name/number"
+    })
+  }
+
+  if (persons.find(person => person.name === body.name)) {
+    return res.status(400).json({
+      error: "name must be unique"
     })
   }
 
   const newPerson = {
+    id: generateId(),
     name: body.name,
     number: Number(body.number),
-    id: generateId() 
   }
 
   persons = persons.concat(newPerson)
